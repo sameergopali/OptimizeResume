@@ -1,6 +1,9 @@
 from importlib import reload
 import sys
 from tabnanny import verbose
+from services.pdfgen import PDFService
+from services import JinjaService
+from services.summary import SummaryService
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
@@ -9,7 +12,7 @@ from langchain_community.chat_models import ChatLlamaCpp
 from langchain_core.prompts import ChatPromptTemplate
 from typing import Optional
 from typing_extensions import Annotated, TypedDict
-from prompts.keywords import SYSPROMPTS
+from prompts import SYSPROMPTS
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import JsonOutputParser
@@ -28,17 +31,18 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 
-# Create FastAPI app instance
+# # Create FastAPI app instance
 app = FastAPI(title="Message Receiver", description="A simple API to receive and print messages")
-localllm = ChatLlamaCpp(
-    model_path="models/jan/model.gguf",
-    temperature=0.0,
-    top_p=0.8,
-    top_k=20,
-    max_tokens=8192,
-    n_ctx=40960,
-    verbose=False
-    )
+
+# localllm = ChatLlamaCpp(
+#     model_path="models/jan/model.gguf",
+#     temperature=0.0,
+#     top_p=0.8,
+#     top_k=20,
+#     max_tokens=8192,
+#     n_ctx=40960,
+#     verbose=False
+#     )
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-pro",
@@ -47,7 +51,11 @@ llm = ChatGoogleGenerativeAI(
     timeout=None,
     max_retries=2,
 )
-# Define the message model
+
+summary_service = SummaryService(llm)
+jinja_service = JinjaService('./jinjatemplates')
+pdf_service = PDFService('./out', './tex')
+
 class Message(BaseModel):
     content: str
 
@@ -57,10 +65,8 @@ class Keywords(BaseModel):
     technical: List[str] = Field(...,description="list of technical skills")
     softskill: List[str] = Field(...,description="list of soft skills")
     
-# Set up a parser + inject instructions into the prompt template.
 parser = JsonOutputParser(pydantic_object=Keywords)
 
-# Store received messages (optional)
 
 
 @app.get("/")
@@ -77,22 +83,16 @@ async def receive_message(message: Message):
         cleaned = message.content[:index]
     else:
         cleaned = message.content
-    system_prompt =  PromptTemplate.from_template(
-            SYSPROMPTS["keyword"],
-    )
-    sysprompt = system_prompt.invoke({"format":parser.get_format_instructions()})
-    human = f'input:\\n\\n{cleaned}'
-    messages =[("system", sysprompt.text),
-            ("human", human)]
-    # print("Processing text", len(cleaned))
-    # ai =  llm.invoke(messages)
-    # print(ai.content)
-    print("generating summary...")
-    messages = [("system", SYSPROMPTS["summary"]),
-                ("human", cleaned)]
-    summary =  llm.invoke(messages)
-    print(summary.content)
- 
+    summary = summary_service.generate(cleaned)
+    tex =  jinja_service.render_summary( summary)
+    pdf_service.add_summary(tex)
+    
+    
+    
+    
+    
+    
+   
 
 def main():
     """Run the FastAPI server"""
@@ -100,5 +100,6 @@ def main():
     uvicorn.run("main:app", host="0.0.0.0", port=8848, reload=True)
 
 if __name__ == "__main__":
-    print(SYSPROMPTS["summary"])
+    tex = jinja_service.render_summary("hello")
+    print(tex)
     main()

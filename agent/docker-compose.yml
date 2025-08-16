@@ -1,0 +1,16 @@
+services:
+  keyword-matcher:
+    build: .
+    container_name: keyword-matcher-app
+    ports:
+      - "8848:8848"
+    environment:
+      - PYTHONPATH=/app
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    volumes:
+      - .:/app
+      - ./tex:/app/tex
+      - ./jinjatemplates:/app/jinjatemplates
+      - /Users/sameergopali/resumeGen:/app/out
+    restart: unless-stopped
+   

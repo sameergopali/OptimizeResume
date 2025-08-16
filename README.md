@@ -17,7 +17,7 @@ A FastAPI-based application that automatically generates keyword-optimized resum
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd KeyWordMatcher
+   cd OptimizeResume
    ```
 
 2. **Set up environment variables**

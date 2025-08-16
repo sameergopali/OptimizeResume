@@ -1,4 +1,4 @@
-# KeyWordMatcher
+# OptimizeResume
 
 A FastAPI-based application that automatically generates keyword-optimized resume summaries using AI. The application analyzes job descriptions, extracts relevant keywords, and generates professional summaries that are optimized for Applicant Tracking Systems (ATS) while maintaining truthfulness and readability.
 

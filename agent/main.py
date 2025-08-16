@@ -41,7 +41,7 @@ localllm = ChatLlamaCpp(
     )
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-2.5-pro",
     temperature=1,
     max_tokens=None,
     timeout=None,
@@ -81,20 +81,18 @@ async def receive_message(message: Message):
             SYSPROMPTS["keyword"],
     )
     sysprompt = system_prompt.invoke({"format":parser.get_format_instructions()})
+    human = f'input:\\n\\n{cleaned}'
     messages =[("system", sysprompt.text),
-            ("human", cleaned)]
-    print("Processing text", len(cleaned))
-    ai =  llm.invoke(messages)
-    
+            ("human", human)]
+    # print("Processing text", len(cleaned))
+    # ai =  llm.invoke(messages)
+    # print(ai.content)
     print("generating summary...")
     messages = [("system", SYSPROMPTS["summary"]),
-                ("human", ai.content)]
+                ("human", cleaned)]
     summary =  llm.invoke(messages)
     print(summary.content)
-    
-        
-        
-    
+ 
 
 def main():
     """Run the FastAPI server"""
@@ -104,11 +102,3 @@ def main():
 if __name__ == "__main__":
     print(SYSPROMPTS["summary"])
     main()
-    
-
-
-    
-    
-
-
-

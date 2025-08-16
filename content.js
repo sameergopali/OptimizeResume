@@ -6,9 +6,32 @@
 
   // Function to extract text content from the page
   function extractTextContent() {
-    // Remove script and style elements to get clean text
-
-
+    // Check if current URL is LinkedIn jobs page
+    if (
+      window.location.href.includes('linkedin.com/jobs/collections/recommended') ||
+      window.location.href.includes('linkedin.com/jobs/search')
+    ) {
+      const jobDiv = document.querySelector('.jobs-box--fadein');
+      if (jobDiv) {
+        const textContent = jobDiv.innerText
+          .replace(/\s+/g, ' ')   // collapse multiple spaces/newlines
+          .trim();
+        
+        const data = {
+          url: window.location.href,
+          title: document.title,
+          content: textContent,
+          timestamp: new Date().toISOString(),
+          contentLength: textContent.length
+        };
+        
+        console.log(data);
+        return data;
+      }
+      console.log("linkedin jobs data not found")
+      return ''
+    }
+    
     // Get the main content - try different selectors for better text extraction
     let content = '';
     

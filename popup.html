@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Content Extractor</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Text Content Extractor</h1>
+      <p>Extract and analyze text content from web pages</p>
+    </header>
+
+    <div class="controls">
+      <button id="extractBtn" class="btn btn-primary">
+        <span class="btn-text">Extract Text</span>
+        <span class="btn-loading" style="display: none;">Extracting...</span>
+      </button>
+    </div>
+
+      
+      <div class="status-item">
+        <span class="status-label">Content Length:</span>
+        <span class="status-value" id="contentLength">0</span>
+      </div>
+    </div>
+
+    <div class="settings">
+      <h3>Settings</h3>
+      <div class="setting-item">
+        <label for="apiEndpoint">API Endpoint:</label>
+        <input type="url" id="apiEndpoint" placeholder="https://127.0.0.1/api/extract">
+        <small class="setting-help">Enter the full URL to your API endpoint</small>
+      </div>
+      
+      <div class="setting-item">
+        <label for="apiKey">API Key (Optional):</label>
+        <input type="password" id="apiKey" placeholder="Enter your API key if required">
+        <small class="setting-help">For authentication with your API</small>
+      </div>
+      
+      <button id="saveSettings" class="btn btn-secondary">Save Settings</button>
+    </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
